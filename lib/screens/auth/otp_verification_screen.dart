@@ -19,16 +19,23 @@ class OTPVerificationScreen extends StatefulWidget {
 }
 
 class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
-  final List<TextEditingController> _controllers = List.generate(6, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+  late final List<TextEditingController> _controllers;
+  late final List<FocusNode> _focusNodes;
+
+  @override
+  void initState() {
+    super.initState();
+    _controllers = List.generate(6, (_) => TextEditingController());
+    _focusNodes = List.generate(6, (_) => FocusNode());
+  }
 
   @override
   void dispose() {
-    for (var c in _controllers) {
-      c.dispose();
+    for (var controller in _controllers) {
+      controller.dispose();
     }
-    for (var f in _focusNodes) {
-      f.dispose();
+    for (var node in _focusNodes) {
+      node.dispose();
     }
     super.dispose();
   }
@@ -54,7 +61,8 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: AppColors.saffron.withOp `acity(0.1),
+                // Replace deprecated withOpacity with withValues
+                color: AppColors.saffron.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.smartphone, size: 50, color: AppColors.saffron),
@@ -117,10 +125,8 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                     // In real app, verify OTP with backend
                     // For demo, just proceed
                     if (widget.isRegistration) {
-                      // After registration, maybe auto-login
                       Navigator.pushReplacementNamed(context, '/citizen-dashboard');
                     } else {
-                      // After login
                       switch (widget.userType) {
                         case UserType.citizen:
                           Navigator.pushReplacementNamed(context, '/citizen-dashboard');
@@ -135,7 +141,10 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                     }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please enter complete OTP'), backgroundColor: Colors.red),
+                      const SnackBar(
+                        content: Text('Please enter complete OTP'),
+                        backgroundColor: Colors.red,
+                      ),
                     );
                   }
                 },

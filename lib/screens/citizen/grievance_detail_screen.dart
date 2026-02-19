@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/colors.dart';
 import '../../models/grievance.dart';
+import '../../models/user.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/grievance_provider.dart';
 
 class GrievanceDetailScreen extends StatelessWidget {
   final Grievance grievance;
@@ -27,27 +29,39 @@ class GrievanceDetailScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Chip(
-                  label: Text(_getStatusText(grievance.status), style: const TextStyle(color: Colors.white)),
+                  label: Text(_getStatusText(grievance.status),
+                      style: const TextStyle(color: Colors.white)),
                   backgroundColor: _getStatusColor(grievance.status),
                 ),
-                Text('Submitted: ${_formatDate(grievance.createdAt)}', style: const TextStyle(color: Colors.grey)),
+                Text('Submitted: ${_formatDate(grievance.createdAt)}',
+                    style: const TextStyle(color: Colors.grey)),
               ],
             ),
             const SizedBox(height: 16),
-            Text(grievance.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text(grievance.title,
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text('Category: ${grievance.category.toString().split('.').last}', style: const TextStyle(color: Colors.grey)),
+            Text('Category: ${grievance.category.toString().split('.').last}',
+                style: const TextStyle(color: Colors.grey)),
             const SizedBox(height: 16),
-            const Text('Description', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            const Text('Description',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             Text(grievance.description),
             if (grievance.attachmentUrl != null) ...[
               const SizedBox(height: 16),
               const Text('Attachment:', style: TextStyle(fontWeight: FontWeight.w600)),
-              Row(children: [const Icon(Icons.attach_file), const SizedBox(width: 8), Text(grievance.attachmentUrl!)]),
+              Row(
+                children: [
+                  const Icon(Icons.attach_file),
+                  const SizedBox(width: 8),
+                  Text(grievance.attachmentUrl!),
+                ],
+              ),
             ],
             const Divider(height: 32),
-            const Text('Remarks / Updates', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Remarks / Updates',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             if (grievance.remarks.isEmpty)
               const Center(child: Text('No remarks yet'))
@@ -69,13 +83,23 @@ class GrievanceDetailScreen extends StatelessWidget {
                             children: [
                               CircleAvatar(
                                 radius: 12,
-                                backgroundColor: remark.userType == 'admin' ? AppColors.saffron : Colors.green,
-                                child: Icon(remark.userType == 'admin' ? Icons.admin_panel_settings : Icons.person, size: 12, color: Colors.white),
+                                backgroundColor: remark.userType == 'admin'
+                                    ? AppColors.saffron
+                                    : Colors.green,
+                                child: Icon(
+                                  remark.userType == 'admin'
+                                      ? Icons.admin_panel_settings
+                                      : Icons.person,
+                                  size: 12,
+                                  color: Colors.white,
+                                ),
                               ),
                               const SizedBox(width: 8),
-                              Text(remark.userName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                              Text(remark.userName,
+                                  style: const TextStyle(fontWeight: FontWeight.w600)),
                               const Spacer(),
-                              Text(_formatDate(remark.createdAt), style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                              Text(_formatDate(remark.createdAt),
+                                  style: const TextStyle(fontSize: 12, color: Colors.grey)),
                             ],
                           ),
                           const SizedBox(height: 8),
@@ -86,61 +110,142 @@ class GrievanceDetailScreen extends StatelessWidget {
                   );
                 },
               ),
-            if (isAdmin && grievance.status != GrievanceStatus.resolved && grievance.status != GrievanceStatus.rejected)
-              _buildAdminActions(context),
+            if (isAdmin &&
+                grievance.status != GrievanceStatus.resolved &&
+                grievance.status != GrievanceStatus.rejected)
+              _AdminActionPanel(grievance: grievance),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAdminActions(BuildContext context) {
-    final TextEditingController remarkController = TextEditingController();
+  Color _getStatusColor(GrievanceStatus status) {
+    switch (status) {
+      case GrievanceStatus.pending:
+        return Colors.orange;
+      case GrievanceStatus.inProgress:
+        return Colors.blue;
+      case GrievanceStatus.resolved:
+        return Colors.green;
+      case GrievanceStatus.rejected:
+        return Colors.red;
+    }
+  }
+
+  String _getStatusText(GrievanceStatus status) {
+    switch (status) {
+      case GrievanceStatus.pending:
+        return 'Pending';
+      case GrievanceStatus.inProgress:
+        return 'In Progress';
+      case GrievanceStatus.resolved:
+        return 'Resolved';
+      case GrievanceStatus.rejected:
+        return 'Rejected';
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+// Separate StatefulWidget to manage admin actions without using deprecated features
+class _AdminActionPanel extends StatefulWidget {
+  final Grievance grievance;
+
+  const _AdminActionPanel({required this.grievance});
+
+  @override
+  State<_AdminActionPanel> createState() => _AdminActionPanelState();
+}
+
+class _AdminActionPanelState extends State<_AdminActionPanel> {
+  final TextEditingController _remarkController = TextEditingController();
+  GrievanceStatus? _selectedStatus;
+
+  @override
+  void dispose() {
+    _remarkController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final grievanceProvider = Provider.of<GrievanceProvider>(context, listen: false);
     final auth = Provider.of<AuthProvider>(context, listen: false);
 
     return Card(
-      color: AppColors.saffron.withOpacity(0.1),
+      color: AppColors.saffron.withValues(alpha: 0.1),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Admin Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const Text('Admin Actions',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 12),
-            DropdownButtonFormField<GrievanceStatus>(
-              initialValue: grievance.status,
-              items: GrievanceStatus.values
-                  .where((s) => s != grievance.status)
-                  .map((s) => DropdownMenuItem(value: s, child: Text(_getStatusText(s))))
-                  .toList(),
-              onChanged: (value) {},
-              decoration: const InputDecoration(labelText: 'Change Status', border: OutlineInputBorder()),
+            // Use DropdownButton instead of DropdownButtonFormField to avoid deprecation
+            InputDecorator(
+              decoration: const InputDecoration(
+                labelText: 'Change Status',
+                border: OutlineInputBorder(),
+              ),
+              child: DropdownButton<GrievanceStatus>(
+                value: _selectedStatus ?? widget.grievance.status,
+                isExpanded: true,
+                underline: const SizedBox(),
+                items: GrievanceStatus.values.map((status) {
+                  return DropdownMenuItem(
+                    value: status,
+                    child: Text(_getStatusText(status)),
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  setState(() {
+                    _selectedStatus = newValue;
+                  });
+                },
+              ),
             ),
             const SizedBox(height: 12),
             TextField(
-              controller: remarkController,
-              decoration: const InputDecoration(labelText: 'Add Remark', border: OutlineInputBorder()),
+              controller: _remarkController,
+              decoration: const InputDecoration(
+                labelText: 'Add Remark',
+                border: OutlineInputBorder(),
+              ),
               maxLines: 3,
             ),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () async {
-                    if (remarkController.text.isNotEmpty) {
+                    if (_remarkController.text.isNotEmpty) {
+                      final scaffoldMessenger = ScaffoldMessenger.of(context);
+                      final navigator = Navigator.of(context);
+                      final newStatus = _selectedStatus ?? widget.grievance.status;
+
                       await grievanceProvider.updateGrievanceStatus(
-                        grievance.id,
-                        grievance.status,
-                        remarkController.text,
+                        widget.grievance.id,
+                        newStatus,
+                        _remarkController.text,
                         auth.currentUser!,
                       );
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Remark added')));
-                        Navigator.pop(context);
+
+                      if (context.mounted) {
+                        scaffoldMessenger.showSnackBar(
+                          const SnackBar(content: Text('Remark added')),
+                        );
+                        navigator.pop();
                       }
                     }
                   },
@@ -154,23 +259,16 @@ class GrievanceDetailScreen extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(GrievanceStatus status) {
-    switch (status) {
-      case GrievanceStatus.pending: return Colors.orange;
-      case GrievanceStatus.inProgress: return Colors.blue;
-      case GrievanceStatus.resolved: return Colors.green;
-      case GrievanceStatus.rejected: return Colors.red;
-    }
-  }
-
   String _getStatusText(GrievanceStatus status) {
     switch (status) {
-      case GrievanceStatus.pending: return 'Pending';
-      case GrievanceStatus.inProgress: return 'In Progress';
-      case GrievanceStatus.resolved: return 'Resolved';
-      case GrievanceStatus.rejected: return 'Rejected';
+      case GrievanceStatus.pending:
+        return 'Pending';
+      case GrievanceStatus.inProgress:
+        return 'In Progress';
+      case GrievanceStatus.resolved:
+        return 'Resolved';
+      case GrievanceStatus.rejected:
+        return 'Rejected';
     }
   }
-
-  String _formatDate(DateTime date) => '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
 }

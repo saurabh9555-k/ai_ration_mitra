@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants/colors.dart';
 import '../../providers/admin_stock_provider.dart';
 import '../../models/stock.dart';
 
@@ -58,6 +57,7 @@ class StockDetailScreen extends StatelessWidget {
             const SizedBox(height: 16),
             ...movements.map((movement) => ListTile(
                   leading: CircleAvatar(
+                    // ignore: deprecated_member_use
                     backgroundColor: _getMovementColor(movement.type).withOpacity(0.2),
                     child: Icon(_getMovementIcon(movement.type), color: _getMovementColor(movement.type), size: 20),
                   ),

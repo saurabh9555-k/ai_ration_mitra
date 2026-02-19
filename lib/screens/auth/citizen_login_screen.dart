@@ -88,9 +88,9 @@ class _CitizenLoginScreenState extends State<CitizenLoginScreen> with SingleTick
   }
 
   Widget _buildHeader() {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Text('Secure Authentication', style: TextStyle(fontSize: 14, color: AppColors.saffron, fontWeight: FontWeight.w600)),
         SizedBox(height: 10),
         Text('Welcome Back!', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),

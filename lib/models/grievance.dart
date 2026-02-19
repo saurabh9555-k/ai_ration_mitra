@@ -36,14 +36,18 @@ class Grievance {
       userId: json['userId'],
       userName: json['userName'],
       userType: json['userType'],
-      category: GrievanceCategory.values.firstWhere((e) => e.toString() == 'GrievanceCategory.${json['category']}'),
+      category: GrievanceCategory.values.firstWhere(
+          (e) => e.toString() == 'GrievanceCategory.${json['category']}'),
       title: json['title'],
       description: json['description'],
       attachmentUrl: json['attachmentUrl'],
-      status: GrievanceStatus.values.firstWhere((e) => e.toString() == 'GrievanceStatus.${json['status']}'),
+      status: GrievanceStatus.values.firstWhere(
+          (e) => e.toString() == 'GrievanceStatus.${json['status']}'),
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
-      remarks: (json['remarks'] as List).map((r) => GrievanceRemark.fromJson(r)).toList(),
+      remarks: (json['remarks'] as List)
+          .map((r) => GrievanceRemark.fromJson(r))
+          .toList(),
     );
   }
 

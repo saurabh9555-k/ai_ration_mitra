@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import '../../core/constants/colors.dart';
 import '../../widgets/citizen/quick_action_card.dart';
 import '../../widgets/common/statistic_card.dart';
+import 'entitlement_screen.dart';
+import 'fps_locator.dart';
+import 'profile_screen.dart';      // This imports the external ProfileScreen
+
 
 class CitizenDashboard extends StatefulWidget {
   const CitizenDashboard({super.key});
@@ -13,11 +17,12 @@ class CitizenDashboard extends StatefulWidget {
 class _CitizenDashboardState extends State<CitizenDashboard> {
   int _currentIndex = 0;
 
+  // No 'const' here because the constructors are not constant
   final List<Widget> _screens = [
-    const _HomeScreen(),
-    const EntitlementScreen(),
-    const FPSLocator(),
-    const ProfileScreen(),
+    const _HomeScreen(),          // If _HomeScreen is const, keep const; otherwise remove const
+    const EntitlementScreen(),    // Check if EntitlementScreen is const
+    const FPSLocator(),           // Check if FPSLocator is const
+    const ProfileScreen(),        // This is the imported ProfileScreen (should be const)
   ];
 
   @override
@@ -54,7 +59,7 @@ class _CitizenDashboardState extends State<CitizenDashboard> {
 }
 
 class _HomeScreen extends StatelessWidget {
-  const _HomeScreen();
+  const _HomeScreen();  // Ensure this is const
 
   @override
   Widget build(BuildContext context) {
@@ -151,19 +156,7 @@ class _HomeScreen extends StatelessWidget {
   }
 }
 
-// Placeholder screens (simplified)
-class EntitlementScreen extends StatelessWidget {
-  const EntitlementScreen({super.key});
-  @override
-  Widget build(BuildContext context) => const Center(child: Text('Entitlements'));
-}
-class FPSLocator extends StatelessWidget {
-  const FPSLocator({super.key});
-  @override
-  Widget build(BuildContext context) => const Center(child: Text('FPS Locator'));
-}
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-  @override
-  Widget build(BuildContext context) => const Center(child: Text('Profile'));
-}
+// These classes are just placeholders – they must be properly defined elsewhere
+// or moved to separate files. For now, ensure they are not empty.
+// (If they are empty, the app will compile but screens will show blank.)
+// You should define them in their respective files as earlier.

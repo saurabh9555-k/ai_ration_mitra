@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'models/grievance.dart';
+
 
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
@@ -23,14 +25,14 @@ import 'screens/auth/admin_register_screen.dart';
 import 'screens/auth/otp_verification_screen.dart';
 
 import 'screens/citizen/citizen_dashboard.dart';
-import 'screens/citizen/entitlement_screen.dart';
-import 'screens/citizen/fps_locator.dart';
 import 'screens/citizen/booking_screen.dart';
 import 'screens/citizen/profile_screen.dart';
 import 'screens/citizen/edit_profile_screen.dart';
 import 'screens/citizen/grievance_list_screen.dart';
 import 'screens/citizen/grievance_form_screen.dart';
 import 'screens/citizen/grievance_detail_screen.dart';
+import 'screens/citizen/entitlement_screen.dart';
+import 'screens/citizen/fps_locator.dart';
 
 import 'screens/fps_dealer/fps_dashboard.dart';
 import 'screens/fps_dealer/stock_management.dart';
@@ -41,7 +43,7 @@ import 'screens/fps_dealer/edit_dealer_profile_screen.dart';
 
 import 'screens/admin/admin_dashboard.dart';
 import 'screens/admin/fps_management.dart';
-import 'screens/admin/alerts_screen.dart';
+import 'screens/admin/alert_screen.dart';
 import 'screens/admin/admin_profile_screen.dart';
 import 'screens/admin/edit_admin_profile_screen.dart';
 import 'screens/admin/admin_grievance_screen.dart';
@@ -141,10 +143,13 @@ class AIRationMitra extends StatelessWidget {
           case '/citizen/grievance-form':
             return MaterialPageRoute(builder: (_) => const GrievanceFormScreen());
           case '/citizen/grievance-detail':
-            final grievance = settings.arguments;
-            return MaterialPageRoute(
-              builder: (_) => GrievanceDetailScreen(grievance: grievance),
-            );
+  if (settings.arguments is! Grievance) {
+    return MaterialPageRoute(builder: (_) => const Scaffold(body: Center(child: Text('Error: Invalid grievance'))));
+  }
+  final grievance = settings.arguments as Grievance;
+  return MaterialPageRoute(
+    builder: (_) => GrievanceDetailScreen(grievance: grievance),
+  );
 
           // FPS Dealer
           case '/fps-dashboard':

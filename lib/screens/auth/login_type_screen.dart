@@ -250,16 +250,16 @@ class LoginTypeScreen extends StatelessWidget {
   }
 
   Widget _buildFooter() {
-    return Column(
+    return const Column(
       children: [
-        const Divider(color: Colors.white30),
-        const SizedBox(height: 10),
+        Divider(color: Colors.white30),
+        SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.security, color: Colors.white70, size: 16),
-            const SizedBox(width: 8),
-            const Text(
+            Icon(Icons.security, color: Colors.white70, size: 16),
+            SizedBox(width: 8),
+            Text(
               'Secure Authentication via UIDAI',
               style: TextStyle(fontSize: 12, color: Colors.white70),
             ),

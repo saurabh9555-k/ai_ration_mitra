@@ -1,11 +1,9 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 
 class StorageService {
   final _secureStorage = const FlutterSecureStorage();
-  final _prefs = SharedPreferences.getInstance();
 
   static const String _userKey = 'user_data';
 

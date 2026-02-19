@@ -4,6 +4,7 @@ import '../../core/constants/colors.dart';
 import '../../providers/grievance_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/grievance.dart';
+import '../../models/user.dart';
 
 class GrievanceFormScreen extends StatefulWidget {
   const GrievanceFormScreen({super.key});
@@ -17,7 +18,6 @@ class _GrievanceFormScreenState extends State<GrievanceFormScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   GrievanceCategory? _selectedCategory;
-  String? _attachmentUrl; // Placeholder for file picker
 
   @override
   void dispose() {
@@ -28,8 +28,7 @@ class _GrievanceFormScreenState extends State<GrievanceFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<AuthProvider>(context);
-    final grievanceProvider = Provider.of<GrievanceProvider>(context, listen: false);
+    final auth = Provider.of<AuthProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -43,21 +42,37 @@ class _GrievanceFormScreenState extends State<GrievanceFormScreen> {
             children: [
               const Text('Please provide details of your issue', style: TextStyle(fontSize: 16)),
               const SizedBox(height: 20),
-              DropdownButtonFormField<GrievanceCategory>(
+              // Custom FormField to avoid deprecated 'value' parameter
+              FormField<GrievanceCategory>(
                 initialValue: _selectedCategory,
-                hint: const Text('Select Category'),
-                items: GrievanceCategory.values.map((cat) {
-                  return DropdownMenuItem(
-                    value: cat,
-                    child: Text(cat.toString().split('.').last),
+                validator: (value) => value == null ? 'Please select category' : null,
+                builder: (FormFieldState<GrievanceCategory> state) {
+                  return InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Category',
+                      border: const OutlineInputBorder(),
+                      errorText: state.errorText,
+                    ),
+                    child: DropdownButton<GrievanceCategory>(
+                      value: state.value,
+                      hint: const Text('Select Category'),
+                      isExpanded: true,
+                      underline: const SizedBox(),
+                      items: GrievanceCategory.values.map((cat) {
+                        return DropdownMenuItem(
+                          value: cat,
+                          child: Text(cat.toString().split('.').last),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        state.didChange(newValue);
+                        setState(() {
+                          _selectedCategory = newValue;
+                        });
+                      },
+                    ),
                   );
-                }).toList(),
-                onChanged: (value) => setState(() => _selectedCategory = value),
-                validator: (v) => v == null ? 'Please select category' : null,
-                decoration: const InputDecoration(
-                  labelText: 'Category',
-                  border: OutlineInputBorder(),
-                ),
+                },
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -67,7 +82,7 @@ class _GrievanceFormScreenState extends State<GrievanceFormScreen> {
                   hintText: 'Brief summary of the issue',
                   border: OutlineInputBorder(),
                 ),
-                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                validator: (value) => value == null || value.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -78,7 +93,7 @@ class _GrievanceFormScreenState extends State<GrievanceFormScreen> {
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 5,
-                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                validator: (value) => value == null || value.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 16),
               OutlinedButton.icon(
@@ -92,37 +107,43 @@ class _GrievanceFormScreenState extends State<GrievanceFormScreen> {
               ),
               const SizedBox(height: 30),
               Consumer<GrievanceProvider>(
-                builder: (context, gp, child) {
+                builder: (context, grievanceProvider, child) {
                   return SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: gp.isLoading
+                      onPressed: grievanceProvider.isLoading
                           ? null
                           : () async {
                               if (_formKey.currentState!.validate()) {
-                                bool success = await gp.submitGrievance(
-                                  userId: auth.currentUser!.id,
-                                  userName: auth.currentUser!.name,
-                                  userType: auth.currentUser!.type == UserType.citizen ? 'citizen' : 'fps',
+                                // Capture necessary objects before async
+                                final scaffoldMessenger = ScaffoldMessenger.of(context);
+                                final navigator = Navigator.of(context);
+                                final currentUser = auth.currentUser!;
+
+                                bool success = await grievanceProvider.submitGrievance(
+                                  userId: currentUser.id,
+                                  userName: currentUser.name,
+                                  userType: currentUser.type == UserType.citizen ? 'citizen' : 'fps',
                                   category: _selectedCategory!,
                                   title: _titleController.text,
                                   description: _descriptionController.text,
                                 );
+
                                 if (success && mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
+                                  scaffoldMessenger.showSnackBar(
                                     const SnackBar(
                                       content: Text('Grievance submitted successfully'),
                                       backgroundColor: AppColors.green,
                                     ),
                                   );
-                                  Navigator.pop(context);
+                                  navigator.pop();
                                 }
                               }
                             },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: gp.isLoading
+                      child: grievanceProvider.isLoading
                           ? const SizedBox(
                               height: 20,
                               width: 20,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants/colors.dart';
 import '../../providers/grievance_provider.dart';
 import '../../models/grievance.dart';
 import '../citizen/grievance_detail_screen.dart';

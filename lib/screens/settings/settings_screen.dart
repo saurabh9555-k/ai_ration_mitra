@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants/colors.dart';
+
 import '../../core/theme/theme_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../models/user.dart';  // <-- IMPORT ADDED for UserType
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -94,8 +95,12 @@ class SettingsScreen extends StatelessWidget {
                   leading: const Icon(Icons.logout, color: Colors.red),
                   title: const Text('Logout', style: TextStyle(color: Colors.red)),
                   onTap: () async {
+                    // Capture navigator before async gap
+                    final navigator = Navigator.of(context);
                     await authProvider.logout();
-                    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                    if (context.mounted) {
+                      navigator.pushNamedAndRemoveUntil('/', (route) => false);
+                    }
                   },
                 ),
               ],

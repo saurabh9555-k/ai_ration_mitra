@@ -97,12 +97,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         fpsId: user.fpsId,
                         address: _addressController.text.isNotEmpty ? _addressController.text : null,
                       );
+
+                      // Capture context-dependent objects before async gap
+                      final scaffoldMessenger = ScaffoldMessenger.of(context);
+                      final navigator = Navigator.of(context);
+
                       await auth.updateProfile(updatedUser);
+
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        scaffoldMessenger.showSnackBar(
                           const SnackBar(content: Text('Profile updated'), backgroundColor: AppColors.green),
                         );
-                        Navigator.pop(context);
+                        navigator.pop();
                       }
                     }
                   },

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants/colors.dart';
+
 import '../../providers/grievance_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/grievance.dart';
 import 'grievance_form_screen.dart';
 import 'grievance_detail_screen.dart';
-import '../../widgets/common/loading_indicator.dart';
+import '../../widgets/common/loading_indicator.dart'; // <-- IMPORT ADDED
 
 class GrievanceListScreen extends StatelessWidget {
   const GrievanceListScreen({super.key});
@@ -17,9 +17,9 @@ class GrievanceListScreen extends StatelessWidget {
     final grievanceProvider = Provider.of<GrievanceProvider>(context);
 
     if (grievanceProvider.isLoading && grievanceProvider.grievances.isEmpty) {
-      return const Scaffold(
-        appBar: AppBar(title: Text('My Grievances')),
-        body: LoadingIndicator(),
+      return Scaffold(
+        appBar: AppBar(title: const Text('My Grievances')),
+        body: const LoadingIndicator(), // Removed 'const' if not needed, but if LoadingIndicator is const, keep it.
       );
     }
 
@@ -68,8 +68,11 @@ class GrievanceListScreen extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: _getStatusColor(grievance.status).withOpacity(0.2),
-                      child: Icon(_getStatusIcon(grievance.status), color: _getStatusColor(grievance.status)),
+                      backgroundColor: _getStatusColor(grievance.status).withValues(alpha: 0.2), // FIXED deprecated
+                      child: Icon(
+                        _getStatusIcon(grievance.status),
+                        color: _getStatusColor(grievance.status),
+                      ),
                     ),
                     title: Text(grievance.title, maxLines: 1, overflow: TextOverflow.ellipsis),
                     subtitle: Text(
@@ -77,7 +80,10 @@ class GrievanceListScreen extends StatelessWidget {
                       style: const TextStyle(fontSize: 12),
                     ),
                     trailing: Chip(
-                      label: Text(_getStatusText(grievance.status), style: const TextStyle(fontSize: 12, color: Colors.white)),
+                      label: Text(
+                        _getStatusText(grievance.status),
+                        style: const TextStyle(fontSize: 12, color: Colors.white),
+                      ),
                       backgroundColor: _getStatusColor(grievance.status),
                     ),
                     onTap: () => Navigator.push(
@@ -95,30 +101,44 @@ class GrievanceListScreen extends StatelessWidget {
 
   Color _getStatusColor(GrievanceStatus status) {
     switch (status) {
-      case GrievanceStatus.pending: return Colors.orange;
-      case GrievanceStatus.inProgress: return Colors.blue;
-      case GrievanceStatus.resolved: return Colors.green;
-      case GrievanceStatus.rejected: return Colors.red;
+      case GrievanceStatus.pending:
+        return Colors.orange;
+      case GrievanceStatus.inProgress:
+        return Colors.blue;
+      case GrievanceStatus.resolved:
+        return Colors.green;
+      case GrievanceStatus.rejected:
+        return Colors.red;
     }
   }
 
   IconData _getStatusIcon(GrievanceStatus status) {
     switch (status) {
-      case GrievanceStatus.pending: return Icons.hourglass_empty;
-      case GrievanceStatus.inProgress: return Icons.autorenew;
-      case GrievanceStatus.resolved: return Icons.check_circle;
-      case GrievanceStatus.rejected: return Icons.cancel;
+      case GrievanceStatus.pending:
+        return Icons.hourglass_empty;
+      case GrievanceStatus.inProgress:
+        return Icons.autorenew;
+      case GrievanceStatus.resolved:
+        return Icons.check_circle;
+      case GrievanceStatus.rejected:
+        return Icons.cancel;
     }
   }
 
   String _getStatusText(GrievanceStatus status) {
     switch (status) {
-      case GrievanceStatus.pending: return 'Pending';
-      case GrievanceStatus.inProgress: return 'In Progress';
-      case GrievanceStatus.resolved: return 'Resolved';
-      case GrievanceStatus.rejected: return 'Rejected';
+      case GrievanceStatus.pending:
+        return 'Pending';
+      case GrievanceStatus.inProgress:
+        return 'In Progress';
+      case GrievanceStatus.resolved:
+        return 'Resolved';
+      case GrievanceStatus.rejected:
+        return 'Rejected';
     }
   }
 
-  String _formatDate(DateTime date) => '${date.day}/${date.month}/${date.year}';
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
 }

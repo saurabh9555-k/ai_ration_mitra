@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants/colors.dart';
+
 import '../../providers/admin_stock_provider.dart';
+import '../../models/stock.dart';
 import '../../widgets/admin/stock_summary_card.dart';
 import '../../widgets/common/loading_indicator.dart';
 import 'stock_detail_screen.dart';
@@ -79,7 +80,7 @@ class _AdminStockScreenState extends State<AdminStockScreen> with SingleTickerPr
               margin: const EdgeInsets.symmetric(vertical: 4),
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: _getStatusColor(item.status).withOpacity(0.2),
+                  backgroundColor: _getStatusColor(item.status).withValues(alpha: 0.2),
                   child: Icon(_getStatusIcon(item.status), color: _getStatusColor(item.status), size: 20),
                 ),
                 title: Text('${item.fpsName} - ${item.itemName}'),
@@ -109,7 +110,7 @@ class _AdminStockScreenState extends State<AdminStockScreen> with SingleTickerPr
               margin: const EdgeInsets.symmetric(vertical: 4),
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: _getMovementColor(movement.type).withOpacity(0.2),
+                  backgroundColor: _getMovementColor(movement.type).withValues(alpha: 0.2),
                   child: Icon(_getMovementIcon(movement.type), color: _getMovementColor(movement.type), size: 20),
                 ),
                 title: Text('${movement.fpsName} - ${movement.itemName}'),
@@ -123,35 +124,49 @@ class _AdminStockScreenState extends State<AdminStockScreen> with SingleTickerPr
 
   Color _getStatusColor(StockStatus status) {
     switch (status) {
-      case StockStatus.good: return Colors.green;
-      case StockStatus.low: return Colors.orange;
-      case StockStatus.critical: return Colors.red;
+      case StockStatus.good:
+        return Colors.green;
+      case StockStatus.low:
+        return Colors.orange;
+      case StockStatus.critical:
+        return Colors.red;
     }
   }
 
   IconData _getStatusIcon(StockStatus status) {
     switch (status) {
-      case StockStatus.good: return Icons.check_circle;
-      case StockStatus.low: return Icons.warning;
-      case StockStatus.critical: return Icons.error;
+      case StockStatus.good:
+        return Icons.check_circle;
+      case StockStatus.low:
+        return Icons.warning;
+      case StockStatus.critical:
+        return Icons.error;
     }
   }
 
   Color _getMovementColor(MovementType type) {
     switch (type) {
-      case MovementType.received: return Colors.green;
-      case MovementType.distributed: return Colors.blue;
-      case MovementType.missing: return Colors.red;
-      case MovementType.incoming: return Colors.orange;
+      case MovementType.received:
+        return Colors.green;
+      case MovementType.distributed:
+        return Colors.blue;
+      case MovementType.missing:
+        return Colors.red;
+      case MovementType.incoming:
+        return Colors.orange;
     }
   }
 
   IconData _getMovementIcon(MovementType type) {
     switch (type) {
-      case MovementType.received: return Icons.download;
-      case MovementType.distributed: return Icons.upload;
-      case MovementType.missing: return Icons.error_outline;
-      case MovementType.incoming: return Icons.schedule;
+      case MovementType.received:
+        return Icons.download;
+      case MovementType.distributed:
+        return Icons.upload;
+      case MovementType.missing:
+        return Icons.error_outline;
+      case MovementType.incoming:
+        return Icons.schedule;
     }
   }
 
