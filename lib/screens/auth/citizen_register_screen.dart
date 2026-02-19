@@ -125,6 +125,7 @@ class _CitizenRegisterScreenState extends State<CitizenRegisterScreen> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       // Create user object (would be sent to backend)
+                      // ignore: unused_local_variable
                       User newUser = User(
                         id: DateTime.now().millisecondsSinceEpoch.toString(),
                         type: UserType.citizen,

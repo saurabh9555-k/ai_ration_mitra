@@ -284,6 +284,7 @@ class TypingIndicator extends StatelessWidget {
         width: 8,
         height: 8,
         margin: const EdgeInsets.symmetric(horizontal: 2),
+        // ignore: duplicate_ignore
         // ignore: deprecated_member_use
         decoration: BoxDecoration(
           color: Colors.black54.withOpacity(value),

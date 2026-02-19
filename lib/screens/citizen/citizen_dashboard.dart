@@ -69,7 +69,7 @@ class _HomeScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.saffron.withOpacity(0.1),
+              color: AppColors.saffron.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: AppColors.saffron),
             ),
@@ -101,7 +101,7 @@ class _HomeScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Chip(label: const Text('UID: 4563 4589 4456'), backgroundColor: AppColors.saffron.withOpacity(0.1)),
+                      Chip(label: const Text('UID: 4563 4589 4456'), backgroundColor: AppColors.saffron.withValues(alpha: 0.1)),
                       const SizedBox(width: 8),
                       const Chip(label: Text('PHH (BPL)'), backgroundColor: Colors.green, labelStyle: TextStyle(color: Colors.white)),
                     ],
